@@ -1,5 +1,4 @@
 {
-  "name": "vcf-url-shortener",
-  "private": true,
+  "name": "urlshortener",
   "version": "1.0.0"
 }
