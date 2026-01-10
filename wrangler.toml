@@ -1,16 +1,7 @@
-{
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "<urlshortener.andrearey.workers.dev>",
-  "main": "src/index.ts",
-  "compatibility_date": "2025-02-04",
-  "observability": {
-    "enabled": true
-  },
+name = "urlshortener-andrearey"
+main = "worker.js"
+compatibility_date = "2025-02-04"
 
-  "kv_namespaces": [
-    {
-      "binding": "KV",
-      "id": "<vcf_urls>"
-    }
-  ]
-}
+[[kv_namespaces]]
+binding = "URLS"
+id = "2342fc9471da4195b5ecb897f5829842"
