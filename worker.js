@@ -13,29 +13,61 @@ export default {
         return new Response("ERROR: KV binding URLS tidak ditemukan");
       }
 
-      const phone = await env.URLS.get(slug);
-
+      let phone = await env.URLS.get(slug);
       if (!phone) {
         return new Response("Slug tidak ditemukan di KV");
       }
 
-      if (host === "wa.vcf.my.id") {
-        return Response.redirect(`https://wa.me/${phone}`, 302);
+      phone = phone.trim();
+
+      // Normalisasi nomor
+      if (phone.startsWith("08")) {
+        phone = "+62" + phone.slice(1);
+      }
+      if (!phone.startsWith("+")) {
+        phone = "+" + phone;
       }
 
-      if (host === "call.vcf.my.id") {
-        return Response.redirect(`tel:${phone}`, 302);
-      }
-
+      // =========================
+      // QR → VCARD CONTACT
+      // =========================
       if (host === "qr.vcf.my.id") {
-        const target = `https://wa.vcf.my.id/${slug}`;
+        const vcard = `
+BEGIN:VCARD
+VERSION:3.0
+N:${slug}
+FN:${slug}
+TEL:${phone}
+END:VCARD
+`.trim();
+
+        return new Response(vcard, {
+          headers: {
+            "Content-Type": "text/vcard; charset=utf-8",
+            "Content-Disposition": `inline; filename="${slug}.vcf"`
+          }
+        });
+      }
+
+      // =========================
+      // WhatsApp
+      // =========================
+      if (host === "wa.vcf.my.id") {
         return Response.redirect(
-          `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(target)}`,
+          `https://wa.me/${phone.replace("+", "")}`,
           302
         );
       }
 
-      return new Response("Domain tidak dikenali");
+      // =========================
+      // Call
+      // =========================
+      if (host === "call.vcf.my.id") {
+        return Response.redirect(`tel:${phone}`, 302);
+      }
+
+      return new Response("Domain tidak dikenali", { status: 400 });
+
     } catch (err) {
       return new Response("CRASH: " + err.message, { status: 500 });
     }
