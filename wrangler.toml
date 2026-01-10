@@ -1,3 +1,7 @@
-name = "urlshortener"
+name = "urlshortener-andrearey"
 main = "worker.js"
 compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "URLS"
+id = "vcf_urls"
